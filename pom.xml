@@ -103,6 +103,12 @@
         <camel-version>4.10.3.redhat-00020</camel-version>
         <camel-spring-boot-version>4.10.3.redhat-00019</camel-spring-boot-version>
 
+
+        <!-- spring boot versions -->
+        <spring-boot-version>3.4.6</spring-boot-version>
+        <springframework-version>6.2.7</springframework-version>
+
+
         <rewrite-recipe-bom.version>3.0.2</rewrite-recipe-bom.version>
 
         <lombok.version>1.18.34</lombok.version>
