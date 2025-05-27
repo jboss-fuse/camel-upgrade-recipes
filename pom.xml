@@ -100,8 +100,8 @@
         <camel4.8-version>4.8.0</camel4.8-version>
         <camel4.9-version>4.9.0</camel4.9-version>
 
-        <camel-version>4.10.3.redhat-00002</camel-version>
-        <camel-spring-boot-version>4.10.3.redhat-00001</camel-spring-boot-version>
+        <camel-version>4.10.3.redhat-00020</camel-version>
+        <camel-spring-boot-version>4.10.3.redhat-00019</camel-spring-boot-version>
 
         <rewrite-recipe-bom.version>3.0.2</rewrite-recipe-bom.version>
 
