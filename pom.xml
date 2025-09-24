@@ -106,8 +106,8 @@
         <camel-spring-boot-version>4.14.0.redhat-00006</camel-spring-boot-version>
 
         <!-- versions for camel-spring-boot -->
-        <spring-boot-version>3.5.5</spring-boot-version>
-        <springframework-version>6.2.10</springframework-version>
+        <spring-boot-version>3.5.6</spring-boot-version>
+        <springframework-version>6.2.11</springframework-version>
 
         <rewrite-recipe-bom.version>3.9.0</rewrite-recipe-bom.version>
 
