@@ -27,7 +27,7 @@
     </parent>
 
     <groupId>org.apache.camel.upgrade</groupId>
-    <version>4.10.6-SNAPSHOT</version>
+    <version>4.10.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <artifactId>camel-parent-upgrade-recipes</artifactId>
 
@@ -100,13 +100,13 @@
         <camel4.8-version>4.8.0</camel4.8-version>
         <camel4.9-version>4.9.0</camel4.9-version>
 
-        <camel-version>4.10.6.redhat-00002</camel-version>
-        <camel-spring-boot-version>4.10.6.redhat-00001</camel-spring-boot-version>
+        <camel-version>4.10.7.redhat-00001</camel-version>
+        <camel-spring-boot-version>4.10.7.redhat-00001</camel-spring-boot-version>
 
 
         <!-- spring boot versions -->
-        <spring-boot-version>3.4.9</spring-boot-version>
-        <springframework-version>6.2.10</springframework-version>
+        <spring-boot-version>3.4.10</spring-boot-version>
+        <springframework-version>6.2.11</springframework-version>
 
 
         <rewrite-recipe-bom.version>3.0.2</rewrite-recipe-bom.version>
