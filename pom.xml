@@ -114,7 +114,7 @@
         <tahu-version>1.0.18</tahu-version>
 
         <!-- versions for camel-spring-boot -->
-        <spring-boot-version>3.5.12</spring-boot-version>
+        <spring-boot-version>3.5.13</spring-boot-version>
         <springframework-version>6.2.17</springframework-version>
 
         <rewrite-recipe-bom.version>3.24.0</rewrite-recipe-bom.version>
