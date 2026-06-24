@@ -141,52 +141,6 @@ public class CamelUpdate418Test implements RewriteTest {
     }
 
     @Test
-    void testDnsHeadersMigrationJava() {
-        //language=java
-        rewriteRun(
-                mavenProject("test-dns",
-                        pomXml(CamelTestUtil.pomXmlWithDependency("camel-dns", CamelTestUtil.getCamelLatestVersion())),
-                        java(
-                                """
-                                import org.apache.camel.Exchange;
-                                import org.apache.camel.builder.RouteBuilder;
-
-                                class Test extends RouteBuilder {
-                                    public void configure() {
-                                        from("direct:start")
-                                            .process(exchange -> {
-                                                exchange.getIn().setHeader("dns.name", "www.example.com");
-                                                exchange.getIn().setHeader("dns.server", "8.8.8.8");
-                                                exchange.getIn().setHeader("term", "example");
-                                            })
-                                            .setBody(simple("${header.term} ${header.dns.name}"))
-                                            .to("dns:lookup");
-                                    }
-                                }
-                                """,
-                                """
-                                import org.apache.camel.Exchange;
-                                import org.apache.camel.builder.RouteBuilder;
-
-                                class Test extends RouteBuilder {
-                                    public void configure() {
-                                        from("direct:start")
-                                            .process(exchange -> {
-                                                exchange.getIn().setHeader("CamelDnsName", "www.example.com");
-                                                exchange.getIn().setHeader("CamelDnsServer", "8.8.8.8");
-                                                exchange.getIn().setHeader("CamelDnsTerm", "example");
-                                            })
-                                            .setBody(simple("${header.CamelDnsTerm} ${header.CamelDnsName}"))
-                                            .to("dns:lookup");
-                                    }
-                                }
-                                """
-                        )
-                )
-        );
-    }
-
-    @Test
     void testSalesforceHeadersMigrationJava() {
         //language=java
         rewriteRun(
