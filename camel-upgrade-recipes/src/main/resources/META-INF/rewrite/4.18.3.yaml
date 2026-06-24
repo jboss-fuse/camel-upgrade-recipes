@@ -1,0 +1,82 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#####
+# Rules coming from https://camel.apache.org/manual/camel-4x-upgrade-guide-4_18.html
+# Specifically changes introduced in 4.18.3 (upgrading from 4.18.1 to 4.18.3)
+# Only productized components are included
+#####
+
+#####
+# Update the Camel project from 4.18.1 to 4.18.3
+#####
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel418_3.CamelMigrationRecipe
+displayName: Migrates `camel 4.18.1` application to `camel 4.18.3`
+description: Migrates `camel 4.18.1` application to `camel 4.18.3`.
+recipeList:
+  # Header renames (only productized components)
+  - org.apache.camel.upgrade.camel418_3.upgradeJiraHeaders
+  - org.apache.camel.upgrade.camel418_3.upgradeGoogleSecretManagerHeaders
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_18.adoc#camel-jira-potential-breaking-change
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel418_3.upgradeJiraHeaders
+displayName: Migrate camel-jira header constants to new naming convention
+description: Renames JIRA header constants to CamelJira* pattern only if camel-jira dependency is present.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-jira
+recipeList:
+  - org.apache.camel.upgrade.headerMigration.RenameHeaders:
+      headerMappings:
+        IssueAssigneeId: CamelJiraIssueAssigneeId
+        IssueAssignee: CamelJiraIssueAssignee
+        IssueComponents: CamelJiraIssueComponents
+        IssueComment: CamelJiraIssueComment
+        IssueChanged: CamelJiraIssueChanged
+        IssueKey: CamelJiraIssueKey
+        IssuePriorityId: CamelJiraIssuePriorityId
+        IssuePriorityName: CamelJiraIssuePriorityName
+        ProjectKey: CamelJiraIssueProjectKey
+        IssueSummary: CamelJiraIssueSummary
+        IssueTransitionId: CamelJiraIssueTransitionId
+        IssueTypeId: CamelJiraIssueTypeId
+        IssueTypeName: CamelJiraIssueTypeName
+        IssueWatchedIssues: CamelJiraIssueWatchedIssues
+        IssueWatchersAdd: CamelJiraIssueWatchersAdd
+        IssueWatchersRemove: CamelJiraIssueWatchersRemove
+        ParentIssueKey: CamelJiraParentIssueKey
+        ChildIssueKey: CamelJiraChildIssueKey
+        linkType: CamelJiraLinkType
+        minutesSpent: CamelJiraMinutesSpent
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_18.adoc#camel-google-secret-manager-potential-breaking-change
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel418_3.upgradeGoogleSecretManagerHeaders
+displayName: Migrate camel-google-secret-manager header constants to new naming convention
+description: Renames Google Secret Manager header constants to CamelGoogleSecretManager* pattern only if camel-google-secret-manager dependency is present.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-google-secret-manager
+recipeList:
+  - org.apache.camel.upgrade.headerMigration.RenameHeaders:
+      headerMappings:
+        GoogleSecretManagerOperation: CamelGoogleSecretManagerOperation

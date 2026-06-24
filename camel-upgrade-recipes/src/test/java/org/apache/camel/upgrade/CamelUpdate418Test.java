@@ -23,6 +23,8 @@ import org.openrewrite.test.RewriteTest;
 import org.openrewrite.test.TypeValidation;
 
 import static org.openrewrite.java.Assertions.java;
+import static org.openrewrite.java.Assertions.mavenProject;
+import static org.openrewrite.maven.Assertions.pomXml;
 
 //class has to stay public, because test is extended in project quarkus-updates
 public class CamelUpdate418Test implements RewriteTest {
@@ -31,7 +33,7 @@ public class CamelUpdate418Test implements RewriteTest {
     public void defaults(RecipeSpec spec) {
         CamelTestUtil.recipe(spec, CamelTestUtil.CamelVersion.v4_18)
                 .parser(CamelTestUtil.parserFromClasspath(CamelTestUtil.CamelVersion.v4_17,
-                        "camel-core-model", "camel-api", "camel-qdrant", "camel-tahu", "tahu-host"))
+                        "camel-core-model", "camel-api", "camel-support", "camel-qdrant", "camel-tahu", "tahu-host"))
                 .typeValidationOptions(TypeValidation.none());
     }
 
@@ -40,7 +42,7 @@ public class CamelUpdate418Test implements RewriteTest {
      */
     @DocumentExample
     @Test
-    void qdrantHeadersChange() {
+    void testQdrantHeadersChange() {
         //language=java
         rewriteRun(java(
                 """
@@ -69,15 +71,15 @@ public class CamelUpdate418Test implements RewriteTest {
      * <a href="https://camel.apache.org/manual/camel-4x-upgrade-guide-4_18.html#_camel_tahu">camel-tahu changes</a>
      */
     @Test
-    void tahuChange() {
+    void testTahuChange() {
         //language=java
         rewriteRun(java(
                 """
                   import org.apache.camel.component.tahu.handlers.TahuHostApplicationEventHandler;
                   import org.eclipse.tahu.host.api.HostApplicationEventHandler;
-                  
+
                   public class TahuTest {
-                  
+
                       public void test()  {
                           HostApplicationEventHandler h1 = null;
                           TahuHostApplicationEventHandler h2 = null;
@@ -87,14 +89,104 @@ public class CamelUpdate418Test implements RewriteTest {
                 """
                   import org.apache.camel.component.tahu.handlers.MultiTahuHostApplicationEventHandler;
                   import org.eclipse.tahu.host.api.MultiHostApplicationEventHandler;
-                  
+
                   public class TahuTest {
-                  
+
                       public void test()  {
                           MultiHostApplicationEventHandler h1 = null;
                           MultiTahuHostApplicationEventHandler h2 = null;
                       }
                   }
                   """));
+    }
+
+    @Test
+    void testKafkaHeadersMigration() {
+        //language=java
+        rewriteRun(
+                mavenProject("test-kafka",
+                        pomXml(CamelTestUtil.pomXmlWithDependency("camel-kafka", CamelTestUtil.getCamelLatestVersion())),
+                        java(
+                                """
+                                import org.apache.camel.Exchange;
+                                import org.apache.camel.builder.RouteBuilder;
+
+                                class Test extends RouteBuilder {
+                                    public void configure() {
+                                        from("direct:start")
+                                            .process(exchange -> {
+                                                exchange.getIn().setHeader("kafka.TOPIC", "topic1");
+                                            })
+                                            .setBody(simple("${header.kafka.TOPIC}"));
+                                    }
+                                }
+                                """,
+                                """
+                                import org.apache.camel.Exchange;
+                                import org.apache.camel.builder.RouteBuilder;
+
+                                class Test extends RouteBuilder {
+                                    public void configure() {
+                                        from("direct:start")
+                                            .process(exchange -> {
+                                                exchange.getIn().setHeader("CamelKafkaTopic", "topic1");
+                                            })
+                                            .setBody(simple("${header.CamelKafkaTopic}"));
+                                    }
+                                }
+                                """
+                        )
+                )
+        );
+    }
+
+    @Test
+    void testSalesforceHeadersMigrationJava() {
+        //language=java
+        rewriteRun(
+                mavenProject("test-salesforce",
+                        pomXml(CamelTestUtil.pomXmlWithDependency("camel-salesforce", CamelTestUtil.getCamelLatestVersion())),
+                        java(
+                                """
+                                import org.apache.camel.Exchange;
+
+                                class Test {
+                                    void configure(Exchange exchange) {
+                                        // Only Salesforce-specific headers are migrated
+                                        exchange.getIn().setHeader("sObjectName", "Account");
+                                        exchange.getIn().setHeader("sObjectQuery", "SELECT Id FROM Account");
+                                        exchange.getIn().setHeader("sObjectId", "001xx000003DGYM");
+                                        exchange.getIn().setHeader("apexMethod", "POST");
+                                        exchange.getIn().setHeader("apexUrl", "/services/apexrest/MyService");
+                                        exchange.getIn().setHeader("apexQueryParam.foo", "bar");
+                                        exchange.getIn().setHeader("pkChunking", "true");
+                                        // Generic headers like jobId, batchId, limit, contentType are NOT migrated
+                                        exchange.getIn().setHeader("jobId", "job123");
+                                        exchange.getIn().setHeader("limit", "100");
+                                    }
+                                }
+                                """,
+                                """
+                                import org.apache.camel.Exchange;
+
+                                class Test {
+                                    void configure(Exchange exchange) {
+                                        // Only Salesforce-specific headers are migrated
+                                        exchange.getIn().setHeader("CamelSalesforceSObjectName", "Account");
+                                        exchange.getIn().setHeader("CamelSalesforceSObjectQuery", "SELECT Id FROM Account");
+                                        exchange.getIn().setHeader("CamelSalesforceSObjectId", "001xx000003DGYM");
+                                        exchange.getIn().setHeader("CamelSalesforceApexMethod", "POST");
+                                        exchange.getIn().setHeader("CamelSalesforceApexUrl", "/services/apexrest/MyService");
+                                        exchange.getIn().setHeader("CamelSalesforceApexQueryParam.foo", "bar");
+                                        exchange.getIn().setHeader("CamelSalesforcePkChunking", "true");
+                                        // Generic headers like jobId, batchId, limit, contentType are NOT migrated
+                                        exchange.getIn().setHeader("jobId", "job123");
+                                        exchange.getIn().setHeader("limit", "100");
+                                    }
+                                }
+                                """
+                        )
+                )
+        );
     }
 }
