@@ -16,9 +16,6 @@
  */
 package org.apache.camel.upgrade.camel47;
 
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.Triple;
 import org.apache.camel.upgrade.AbstractCamelJavaVisitor;
 import org.apache.camel.upgrade.RecipesUtil;
 import org.openrewrite.ExecutionContext;
@@ -35,14 +32,24 @@ import java.util.Optional;
 /**
  * Replaces prefix with the new one and changes the suffix tp start with lower case
  */
-@EqualsAndHashCode(callSuper = false)
-@RequiredArgsConstructor
 public class Java47Recipes extends Recipe {
 
+    /**
+     * Simple triple class to hold three related values
+     */
+    private static class Triple {
+        final String a;
+        final String b;
+        final String c;
 
-    private static final String MATCHER_GET_HEADER = "org.apache.camel.Message getHeader(java.lang.String, java.lang.Class)";
+        Triple(String a, String b, String c) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+    }
     private static final String MATCHER_GET_IN = "org.apache.camel.Exchange getIn()";
-    private static final List<Triple<String, String, String>> HEADERS_MAP = Arrays.asList(
+    private static final List<Triple> HEADERS_MAP = Arrays.asList(
             new Triple("org.apache.camel.Message getHeader(java.lang.String, java.lang.Class)", "Exchange.HTTP_SERVLET_REQUEST", "#{any(org.apache.camel.Exchange)}.getMessage(HttpMessage.class).getRequest()"),
             new Triple("org.apache.camel.Message getHeader(java.lang.String, java.lang.Class)", "Exchange.HTTP_SERVLET_RESPONSE", "#{any(org.apache.camel.Exchange)}.getMessage(HttpMessage.class).getResponse()"));
 

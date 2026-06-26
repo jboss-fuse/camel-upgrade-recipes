@@ -16,22 +16,19 @@
  */
 package org.apache.camel.upgrade.camel40.yaml;
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
 import org.apache.camel.upgrade.AbstractCamelYamlVisitor;
 import org.apache.camel.upgrade.RecipesUtil;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
 import org.openrewrite.TreeVisitor;
+import org.openrewrite.internal.ListUtils;
 import org.openrewrite.yaml.JsonPathMatcher;
 import org.openrewrite.yaml.YamlIsoVisitor;
 import org.openrewrite.yaml.format.IndentsVisitor;
 import org.openrewrite.yaml.style.IndentsStyle;
 import org.openrewrite.yaml.tree.Yaml;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fixes following yaml change.
@@ -58,11 +55,7 @@ import java.util.List;
  *       - log: "message"
  * </pre>
  */
-@EqualsAndHashCode(callSuper = false)
-@Value
 public class CamelYamlStepsInFromRecipe extends Recipe {
-
-    private static final String[] PATHS_TO_PRE_CHECK = new String[] { "route.from" };
     private static final JsonPathMatcher MATCHER_WITHOUT_ROUTE = new JsonPathMatcher("$.steps");
     private static final JsonPathMatcher MATCHER_WITH_ROUTE = new JsonPathMatcher("$.route.steps");
 
@@ -79,7 +72,7 @@ public class CamelYamlStepsInFromRecipe extends Recipe {
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
 
-        return new AbstractCamelYamlVisitor() {
+        return Preconditions.check(RecipesUtil.camelYamlDslPrecondition(), new AbstractCamelYamlVisitor() {
             //both variables has to be set to null, to mark the migration done
             Yaml.Mapping from = null;
             Yaml.Mapping.Entry steps = null;
@@ -127,9 +120,7 @@ public class CamelYamlStepsInFromRecipe extends Recipe {
                         Yaml.Mapping m = super.visitMapping(mapping, ctx);
 
                         if (m == from) {
-                            List<Yaml.Mapping.Entry> entries = new ArrayList<>(m.getEntries());
-                            entries.add(steps.copyPaste().withPrefix("\n"));
-                            m = m.withEntries(entries);
+                            m = m.withEntries(ListUtils.concat(m.getEntries(), steps.copyPaste().withPrefix("\n")));
                         }
 
                         return m;
@@ -139,7 +130,7 @@ public class CamelYamlStepsInFromRecipe extends Recipe {
                 //TODO might probably change indent in original file, may this happen?
                 doAfterVisit(new IndentsVisitor(new IndentsStyle(2), null));
             }
-        };
+        });
     }
 
 }
