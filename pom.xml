@@ -27,7 +27,7 @@
     </parent>
 
     <groupId>org.apache.camel.upgrade</groupId>
-    <version>4.21.0-SNAPSHOT</version>
+    <version>4.22.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <artifactId>camel-parent-upgrade-recipes</artifactId>
 
@@ -108,10 +108,10 @@
         <camel4.10-lts-version>4.10.6</camel4.10-lts-version>
 
         <!-- versions for latest recipes, has to be kept aligned to the latest camel release -->
-        <camel-latest-version>4.21.0</camel-latest-version>
+        <camel-latest-version>4.22.0</camel-latest-version>
 
-        <camel-version>4.21.0-SNAPSHOT</camel-version>
-        <camel-spring-boot-version>4.21.0-SNAPSHOT</camel-spring-boot-version>
+        <camel-version>4.22.0-SNAPSHOT</camel-version>
+        <camel-spring-boot-version>4.22.0-SNAPSHOT</camel-spring-boot-version>
 
         <!-- versions for OpenRewrite dependencies -->
         <tahu-version>1.0.18</tahu-version>
