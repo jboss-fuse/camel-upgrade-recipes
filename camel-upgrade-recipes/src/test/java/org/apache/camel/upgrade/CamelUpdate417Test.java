@@ -143,4 +143,23 @@ public class CamelUpdate417Test implements RewriteTest {
                 """));
     }
 
+    @Test
+    void transformEipWithoutDataType() {
+        // A no-argument transform() starts an expression clause and remains valid in Camel 4.17+.
+        rewriteRun(java(
+                """
+                import org.apache.camel.builder.RouteBuilder;
+
+                public class TransformRoute extends RouteBuilder {
+
+                    @Override
+                    public void configure() {
+                        from("direct:start")
+                            .transform().method("myBean", "saySomething")
+                            .to("mock:result");
+                    }
+                }
+                """));
+    }
+
 }
