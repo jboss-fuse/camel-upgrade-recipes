@@ -115,6 +115,12 @@ name: org.apache.camel.upgrade.camel419.upgradeSpringFrameworkDependencies
 displayName: Upgrade Spring Framework dependencies for Camel 4.19
 description: Upgrades Spring Boot to 4.x, Spring Framework to 7.x, Spring Security to 7.x, and Spring Batch to 6.x using custom recipes.
 recipeList:
+  # Spring Boot 4 Undertow is provided by the CSB-managed replacement.
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.springframework.boot
+      oldArtifactId: spring-boot-starter-undertow
+      newGroupId: com.redhat.integration
+      newArtifactId: spring-boot-starter-undertow
   # Upgrade Spring Boot 3 to 4
   - org.apache.camel.upgrade.spring.UpgradeSpringBoot3To4
   # Upgrade Spring Framework 6 to 7
