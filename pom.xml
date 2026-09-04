@@ -27,7 +27,7 @@
     </parent>
 
     <groupId>org.apache.camel.upgrade</groupId>
-    <version>4.18.3-SNAPSHOT</version>
+    <version>4.18.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <artifactId>camel-parent-upgrade-recipes</artifactId>
 
@@ -105,11 +105,11 @@
         <camel4.17-version>4.17.0</camel4.17-version>
 
         <camel4.10-lts-version>4.10.6</camel4.10-lts-version>
-        <camel4.18-lts-version>4.18.1</camel4.18-lts-version>
-        <camel-latest-version>4.18.1</camel-latest-version>
+        <camel4.18-lts-version>4.18.4</camel4.18-lts-version>
+        <camel-latest-version>4.18.4</camel-latest-version>
 
-        <camel-version>4.18.3.redhat-00001</camel-version>
-        <camel-spring-boot-version>4.18.3.redhat-00001</camel-spring-boot-version>
+        <camel-version>4.18.4-SNAPSHOT</camel-version>
+        <camel-spring-boot-version>4.18.4-SNAPSHOT</camel-spring-boot-version>
 
         <!-- other versions used by the tests -->
         <tahu-version>1.0.18</tahu-version>
