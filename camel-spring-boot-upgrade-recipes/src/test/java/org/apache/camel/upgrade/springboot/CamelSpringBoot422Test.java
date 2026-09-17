@@ -208,7 +208,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                                 <dependency>
                                     <groupId>org.apache.camel</groupId>
                                     <artifactId>camel-ai-tool</artifactId>
-                                    <version>4.22.0</version>
+                                    <version>4.22.1</version>
                                 </dependency>
                             </dependencies>
                         </project>
