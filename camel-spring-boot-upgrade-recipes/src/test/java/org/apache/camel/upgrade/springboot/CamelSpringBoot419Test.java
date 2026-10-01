@@ -22,7 +22,7 @@ class CamelSpringBoot419Test {
 
         assertTrue(recipeText.contains("oldGroupId: org.springframework.boot"));
         assertTrue(recipeText.contains("oldArtifactId: spring-boot-starter-undertow"));
-        assertTrue(recipeText.contains("newGroupId: com.redhat.integration"));
-        assertTrue(recipeText.contains("newArtifactId: spring-boot-starter-undertow"));
+        assertTrue(recipeText.contains("newGroupId: io.undertow"));
+        assertTrue(recipeText.contains("newArtifactId: undertow-spring-boot-starter"));
     }
 }

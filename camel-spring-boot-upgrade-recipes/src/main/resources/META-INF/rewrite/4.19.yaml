@@ -123,8 +123,8 @@ recipeList:
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: org.springframework.boot
       oldArtifactId: spring-boot-starter-undertow
-      newGroupId: com.redhat.integration
-      newArtifactId: spring-boot-starter-undertow
+      newGroupId: io.undertow
+      newArtifactId: undertow-spring-boot-starter
   # Upgrade Spring Boot 3 to 4
   - org.apache.camel.upgrade.spring.UpgradeSpringBoot3To4
   # Upgrade Spring Framework 6 to 7
