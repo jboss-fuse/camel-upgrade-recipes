@@ -113,6 +113,8 @@
 
         <camel-version>${project.version}</camel-version>
         <camel-spring-boot-version>${project.version}</camel-spring-boot-version>
+        <spring-boot-version>4.1.1</spring-boot-version>
+        <springframework-version>7.0.9</springframework-version>
 
         <!-- versions for OpenRewrite dependencies -->
         <tahu-version>1.0.18</tahu-version>
