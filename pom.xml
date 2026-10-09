@@ -111,8 +111,8 @@
         <!-- versions for latest recipes, has to be kept aligned to the latest camel release -->
         <camel-latest-version>4.22.1</camel-latest-version>
 
-        <camel-version>${project.version}</camel-version>
-        <camel-spring-boot-version>${project.version}</camel-spring-boot-version>
+        <camel-version>4.22.1-SNAPSHOT</camel-version>
+        <camel-spring-boot-version>4.22.1-SNAPSHOT</camel-spring-boot-version>
         <spring-boot-version>4.1.1</spring-boot-version>
         <springframework-version>7.0.9</springframework-version>
 
