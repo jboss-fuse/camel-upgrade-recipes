@@ -46,6 +46,13 @@ $ mvn -U org.openrewrite.maven:rewrite-maven-plugin:run -Drewrite.recipeArtifact
 ```
 
 
+Camel Spring Boot 4.22.1 and later replace Spring Boot 3's `spring-boot-starter-undertow` with `io.undertow:undertow-spring-boot-starter`. The Spring Boot migration recipe rewrites the dependency, direct Undertow EE dependencies and the Undertow Java API. The deprecated `server.undertow.*` and `management.server.undertow.*` keys still work with that starter, so they are left untouched by default. To rename them to `undertow.server.*` and `undertow.management.*`, run the opt-in recipe explicitly:
+
+```
+$ mvn -U org.openrewrite.maven:rewrite-maven-plugin:run -Drewrite.recipeArtifactCoordinates=org.apache.camel.upgrade:camel-spring-boot-upgrade-recipes:LATEST -Drewrite.activeRecipes=org.apache.camel.upgrade.undertow.MigrateUndertowProperties
+```
+
+
 To apply specific recipes you can use the following script:
 
 ```
