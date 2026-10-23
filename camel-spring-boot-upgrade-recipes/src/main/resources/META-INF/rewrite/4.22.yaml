@@ -24,6 +24,9 @@ recipeList:
   - org.apache.camel.upgrade.camel422.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422.migrateSpringAiToolsStarterDependency
   - org.apache.camel.upgrade.camel422.migrateAiToolStarterDependency
+  # Spring Boot Undertow integration -> io.undertow:undertow-spring-boot-starter (first managed by CSB 4.22.1).
+  # Deprecated server.undertow.* keys are kept; see org.apache.camel.upgrade.undertow.MigrateUndertowProperties.
+  - org.apache.camel.upgrade.undertow.MigrateToUndertowSpringBootStarter
 ---
 ## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#camel-spring-ai-chat
 type: specs.openrewrite.org/v1beta/recipe

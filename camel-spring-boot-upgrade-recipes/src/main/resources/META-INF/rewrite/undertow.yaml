@@ -1,0 +1,136 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+---
+# Spring Boot 4 removed its Undertow integration. Camel Spring Boot 4.22.1 and later
+# use io.undertow:undertow-spring-boot-starter instead. The starter coordinate itself is
+# rewritten by org.apache.camel.upgrade.camel419.upgradeSpringFrameworkDependencies;
+# this recipe migrates what else can change: direct Undertow EE dependencies, Undertow
+# properties that no longer exist, and the Spring Boot Undertow Java API.
+#
+# The starter still reads the deprecated server.undertow.* and management.server.undertow.*
+# keys and logs a WARN listing them, so the key rename is NOT part of this recipe. Run
+# org.apache.camel.upgrade.undertow.MigrateUndertowProperties explicitly to rename them.
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.undertow.MigrateToUndertowSpringBootStarter
+displayName: Migrate from the Spring Boot Undertow integration to undertow-spring-boot-starter
+description: >-
+  Migrates an application from Spring Boot 3's Undertow integration to io.undertow:undertow-spring-boot-starter.
+  Replaces direct io.undertow:undertow-servlet and io.undertow:undertow-websockets-jsr dependencies with their
+  Undertow EE equivalents, removes Undertow properties that have no replacement, and changes the Spring Boot
+  Undertow customizer and factory types to the io.undertow.springboot types. Deprecated server.undertow.* keys keep
+  working and are left in place; use org.apache.camel.upgrade.undertow.MigrateUndertowProperties to rename them.
+recipeList:
+  - org.apache.camel.upgrade.undertow.MigrateUndertowEEDependencies
+  - org.apache.camel.upgrade.undertow.RemoveUnsupportedUndertowProperties
+  - org.apache.camel.upgrade.undertow.MigrateUndertowJavaApi
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.undertow.MigrateUndertowEEDependencies
+displayName: Migrate direct Undertow Servlet and WebSocket dependencies to Undertow EE
+description: >-
+  Replaces direct io.undertow:undertow-servlet and io.undertow:undertow-websockets-jsr dependencies and managed
+  dependencies with io.undertow.ee:undertow-servlet and io.undertow.ee:undertow-websockets, the Jakarta Servlet 6.1
+  implementations used by undertow-spring-boot-starter. io.undertow:undertow-core is unchanged.
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.undertow
+      oldArtifactId: undertow-servlet
+      newGroupId: io.undertow.ee
+      newArtifactId: undertow-servlet
+      newVersion: @undertow-ee-version@
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.undertow
+      oldArtifactId: undertow-websockets-jsr
+      newGroupId: io.undertow.ee
+      newArtifactId: undertow-websockets
+      newVersion: @undertow-ee-version@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.undertow.RemoveUnsupportedUndertowProperties
+displayName: Remove Undertow properties that have no replacement in undertow-spring-boot-starter
+description: >-
+  Removes server.undertow.buffers-per-region, which has no replacement, and comments out
+  server.undertow.allow-encoded-slash, which was deprecated in Spring Boot 3 and has no counterpart. Decoding of
+  encoded slashes must be reviewed explicitly through undertow.server.decode-slash.
+recipeList:
+  - org.openrewrite.properties.DeleteProperty:
+      propertyKey: server.undertow.buffers-per-region
+  - org.openrewrite.yaml.DeleteKey:
+      keyPath: $.server.undertow.buffers-per-region
+  - org.openrewrite.properties.AddPropertyComment:
+      propertyKey: server.undertow.allow-encoded-slash
+      comment: "server.undertow.allow-encoded-slash has no replacement in undertow-spring-boot-starter; review undertow.server.decode-slash instead"
+      commentOutProperty: true
+  - org.openrewrite.yaml.CommentOutProperty:
+      propertyKey: server.undertow.allow-encoded-slash
+      commentText: "server.undertow.allow-encoded-slash has no replacement in undertow-spring-boot-starter; review undertow.server.decode-slash instead"
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.undertow.MigrateUndertowJavaApi
+displayName: Migrate the Spring Boot Undertow Java API to io.undertow.springboot
+description: >-
+  Changes the Spring Boot 3 Undertow customizer and web server factory types to their io.undertow.springboot
+  replacements. ServerProperties.Undertow and ServerProperties.getUndertow() have no mechanical replacement and
+  are only marked; inject io.undertow.springboot.autoconfigure.UndertowServerProperties instead.
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.boot.web.embedded.undertow.UndertowBuilderCustomizer
+      newFullyQualifiedTypeName: io.undertow.springboot.UndertowBuilderCustomizer
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.boot.web.embedded.undertow.ConfigurableUndertowWebServerFactory
+      newFullyQualifiedTypeName: io.undertow.springboot.ConfigurableUndertowWebServerFactory
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory
+      newFullyQualifiedTypeName: io.undertow.springboot.servlet.UndertowServletWebServerFactory
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer
+      newFullyQualifiedTypeName: io.undertow.springboot.servlet.UndertowDeploymentInfoCustomizer
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.boot.web.embedded.undertow.UndertowReactiveWebServerFactory
+      newFullyQualifiedTypeName: io.undertow.springboot.reactive.UndertowReactiveWebServerFactory
+  - org.openrewrite.java.search.FindTypes:
+      fullyQualifiedTypeName: org.springframework.boot.autoconfigure.web.ServerProperties$Undertow
+  - org.openrewrite.java.search.FindMethods:
+      methodPattern: org.springframework.boot.autoconfigure.web.ServerProperties getUndertow()
+---
+# Opt-in: not part of the Camel Spring Boot migration chain. The deprecated keys still work
+# in undertow-spring-boot-starter 1.0.0; they are scheduled for removal in its next feature release.
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.undertow.MigrateUndertowProperties
+displayName: Rename deprecated server.undertow.* properties to undertow.server.*
+description: >-
+  Renames the deprecated server.undertow.* and management.server.undertow.* configuration keys to
+  undertow.server.* and undertow.management.* in properties and YAML files. In YAML the moved keys are written as
+  dotted top-level keys (undertow.server:, undertow.management:), which Spring Boot binds like nested blocks. Camel's
+  own camel.component.platform-http.server.undertow.* keys are not changed. This recipe is not activated by the
+  Camel Spring Boot migration recipes because the deprecated keys still work; activate it explicitly.
+recipeList:
+  - org.apache.camel.upgrade.undertow.RemoveUnsupportedUndertowProperties
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: ^management\.server\.undertow\.(.+)$
+      newPropertyKey: undertow.management.$1
+      regex: true
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: ^server\.undertow\.(.+)$
+      newPropertyKey: undertow.server.$1
+      regex: true
+  - org.openrewrite.yaml.ChangePropertyKey:
+      oldPropertyKey: management.server.undertow
+      newPropertyKey: undertow.management
+  - org.openrewrite.yaml.ChangePropertyKey:
+      oldPropertyKey: server.undertow
+      newPropertyKey: undertow.server
