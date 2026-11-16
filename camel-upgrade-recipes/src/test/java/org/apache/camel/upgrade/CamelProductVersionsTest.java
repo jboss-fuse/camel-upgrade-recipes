@@ -38,14 +38,14 @@ class CamelProductVersionsTest implements RewriteTest {
     void alignsExplicitCoreAndKameletsWithoutChangingOtherGroups() {
         String before = project("", """
             <dependencies>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.1</version></dependency>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.1</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.0</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.0</version></dependency>
               <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>4.21.0</version></dependency>
               <dependency><groupId>org.example</groupId><artifactId>unrelated</artifactId><version>4.21.0</version></dependency>
             </dependencies>
             """);
         rewriteRun(pomXml(before, before
-                .replace("<version>4.22.1</version>", "<version>" + CORE + "</version>")
+                .replace("<version>4.22.0</version>", "<version>" + CORE + "</version>")
                 .replace("<artifactId>camel-kamelets</artifactId><version>4.21.0</version>",
                          "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>")));
     }
@@ -102,14 +102,85 @@ class CamelProductVersionsTest implements RewriteTest {
         String before = project("", """
             <properties><maven.compiler.release>17</maven.compiler.release></properties>
             <dependencies>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.1</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.0</version></dependency>
               <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>4.21.0</version></dependency>
             </dependencies>
             """);
-        String after = before.replace("<version>4.22.1</version>", "<version>" + CORE + "</version>")
+        String after = before.replace("<version>4.22.0</version>", "<version>" + CORE + "</version>")
                 .replace("<version>4.21.0</version>", "<version>" + KAMELETS + "</version>");
         rewriteRun(spec -> spec.recipeFromResources("org.apache.camel.upgrade.CamelMigrationRecipe"),
                 pomXml(before, after));
+    }
+
+    @Test
+    void separatesSharedCamelVersionBeforeApplyingIndependentTargets() {
+        assertSharedVersionTargets("camel.version");
+    }
+
+    @Test
+    void separatesSharedCustomVersionBeforeApplyingIndependentTargets() {
+        assertSharedVersionTargets("dependencies.version");
+    }
+
+    private void assertSharedVersionTargets(String property) {
+        String before = project("", """
+            <properties><%1$s>4.21.0</%1$s></properties>
+            <dependencies>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>${%1$s}</version></dependency>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>${%1$s}</version></dependency>
+            </dependencies>
+            """.formatted(property));
+        String after = before.replace("4.21.0", CORE)
+                .replace("<artifactId>camel-kamelets</artifactId><version>${" + property + "}</version>",
+                        "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>");
+        rewriteRun(spec -> spec.cycles(3).expectedCyclesThatMakeChanges(1), pomXml(before, after));
+    }
+
+    @Test
+    void separatesSharedVersionsInDependencyManagement() {
+        String before = project("", """
+            <properties><camel.version>4.21.0</camel.version></properties>
+            <dependencyManagement><dependencies>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>${camel.version}</version></dependency>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>${camel.version}</version></dependency>
+            </dependencies></dependencyManagement>
+            <dependencies>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId></dependency>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId></dependency>
+            </dependencies>
+            """);
+        String after = before.replace("4.21.0", CORE)
+                .replace("<artifactId>camel-kamelets</artifactId><version>${camel.version}</version>",
+                        "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>");
+        rewriteRun(spec -> spec.cycles(3).expectedCyclesThatMakeChanges(1), pomXml(before, after));
+    }
+
+    @Test
+    void sharedKameletsPropertyDoesNotChangeUnrelatedDependencies() {
+        String before = project("", """
+            <properties><shared.version>4.21.0</shared.version></properties>
+            <dependencies>
+              <dependency><groupId>org.example</groupId><artifactId>unrelated</artifactId><version>${shared.version}</version></dependency>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>${shared.version}</version></dependency>
+            </dependencies>
+            """);
+        String after = before.replace("<artifactId>camel-kamelets</artifactId><version>${shared.version}</version>",
+                "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>");
+        rewriteRun(spec -> spec.cycles(3).expectedCyclesThatMakeChanges(1), pomXml(before, after));
+    }
+
+    @Test
+    void separatesCamelVersionEvenWithoutACoreDependency() {
+        String before = project("", """
+            <properties><camel.version>4.21.0</camel.version></properties>
+            <dependencies>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>${camel.version}</version></dependency>
+            </dependencies>
+            """);
+        String after = before.replace("4.21.0", CORE)
+                .replace("<artifactId>camel-kamelets</artifactId><version>${camel.version}</version>",
+                        "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>");
+        rewriteRun(spec -> spec.cycles(3).expectedCyclesThatMakeChanges(1), pomXml(before, after));
     }
 
 }

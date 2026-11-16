@@ -42,16 +42,15 @@ class CamelSpringBootProductVersionsTest implements RewriteTest {
               <groupId>com.redhat.camel.springboot.platform</groupId><artifactId>camel-spring-boot-bom</artifactId><version>4.14.2</version><type>pom</type><scope>import</scope>
             </dependency></dependencies></dependencyManagement>
             <dependencies>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.1</version></dependency>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.1</version></dependency>
-              <dependency><groupId>org.apache.camel.springboot</groupId><artifactId>camel-timer-starter</artifactId><version>4.22.0</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.0</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.0</version></dependency>
+              <dependency><groupId>org.apache.camel.springboot</groupId><artifactId>camel-timer-starter</artifactId><version>4.14.2</version></dependency>
               <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>4.21.0</version></dependency>
             </dependencies>
             """);
         String after = before.replace("4.14.2", CSB)
-                .replace("<version>4.22.1</version>", "")
-                .replace("<version>4.21.0</version>", "")
-                .replace("<version>4.22.0</version>", "<version>" + CSB + "</version>");
+                .replace("<version>4.22.0</version>", "")
+                .replace("<version>4.21.0</version>", "");
         rewriteRun(pomXml(before, after));
     }
 
@@ -60,14 +59,29 @@ class CamelSpringBootProductVersionsTest implements RewriteTest {
         String before = project("", """
             <properties><maven.compiler.release>17</maven.compiler.release></properties>
             <dependencies>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.1</version></dependency>
-              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.1</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>4.22.0</version></dependency>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-vertx</artifactId><version>4.22.0</version></dependency>
               <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>4.21.0</version></dependency>
             </dependencies>
             """);
-        String after = before.replace("<version>4.22.1</version>", "<version>" + CORE + "</version>")
+        String after = before.replace("<version>4.22.0</version>", "<version>" + CORE + "</version>")
                 .replace("<version>4.21.0</version>", "<version>" + KAMELETS + "</version>");
         rewriteRun(pomXml(before, after));
+    }
+
+    @Test
+    void fullSpringBootRecipeSeparatesSharedVersionTargetsAndConverges() {
+        String before = project("", """
+            <properties><maven.compiler.release>17</maven.compiler.release><camel.version>4.21.0</camel.version></properties>
+            <dependencies>
+              <dependency><groupId>org.apache.camel</groupId><artifactId>camel-platform-http-main</artifactId><version>${camel.version}</version></dependency>
+              <dependency><groupId>org.apache.camel.kamelets</groupId><artifactId>camel-kamelets</artifactId><version>${camel.version}</version></dependency>
+            </dependencies>
+            """);
+        String after = before.replace("4.21.0", CORE)
+                .replace("<artifactId>camel-kamelets</artifactId><version>${camel.version}</version>",
+                        "<artifactId>camel-kamelets</artifactId><version>" + KAMELETS + "</version>");
+        rewriteRun(spec -> spec.cycles(3).expectedCyclesThatMakeChanges(1), pomXml(before, after));
     }
 
 }

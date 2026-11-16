@@ -20,6 +20,7 @@ name: org.apache.camel.upgrade.AlignCamelVersions
 displayName: Align Camel and Kamelets dependency versions
 description: Aligns Camel dependencies, plugins, parents and Kamelets to their independently configured target versions after API migrations.
 recipeList:
+  - org.apache.camel.upgrade.SeparateSharedKameletsVersion
   - org.openrewrite.maven.UpgradeDependencyVersion:
       groupId: 'org.apache.camel'
       artifactId: '*'
