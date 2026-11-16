@@ -67,6 +67,16 @@ $ mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.0.4:run \
 This project is not meant for migration of an application based on Camel-Quarkus. Use https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.0[Quakus migration guide] instead.
 ====
 
+== Migration target versions
+
+The latest recipes align Camel core dependencies, Maven plugins and parents to `camel-version`, and Camel Spring Boot artifacts to `camel-spring-boot-version`.
+The Kamelets catalog uses `camel-kamelets-version`, which defaults to `${camel-version}` and can be overridden independently at build time.
+Version alignment also runs after the Spring Boot migrations, so dependencies added during migration receive the configured targets.
+Dependencies managed by the target BOM can remain without explicit versions.
+`camel-latest-version` continues to identify the latest supported migration recipe version.
+
+The recipe artifact's own release version is separate from these dependency targets.
+
 == JUnit testing
 
 Several migration paths to different versions must be covered by the tests.

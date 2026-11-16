@@ -26,7 +26,7 @@ public class CamelUpdateLatestVersionTest extends AbstractCamelUpdateVersionTest
 
     @Override
     protected String targetVersion() {
-        return CamelTestUtil.getCamelLatestVersion();
+        return CamelTestUtil.getCamelTargetVersion();
     }
 
 }
