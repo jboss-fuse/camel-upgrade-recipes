@@ -112,6 +112,8 @@
         <camel-latest-version>4.22.1</camel-latest-version>
 
         <camel-version>4.22.1-SNAPSHOT</camel-version>
+        <!-- Kamelets may use an independent target version; default to the Camel build. -->
+        <camel-kamelets-version>${camel-version}</camel-kamelets-version>
         <camel-spring-boot-version>4.22.1-SNAPSHOT</camel-spring-boot-version>
         <spring-boot-version>4.1.2</spring-boot-version>
         <springframework-version>7.0.10</springframework-version>

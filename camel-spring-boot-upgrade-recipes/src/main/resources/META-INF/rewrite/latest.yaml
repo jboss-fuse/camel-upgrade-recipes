@@ -55,3 +55,9 @@ recipeList:
       groupId: org.springframework.boot
       artifactId: spring-boot-starter-parent
       newVersion: @spring-boot-version@
+  # API migrations can add explicit versions; align after all migrations and BOM updates.
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.camel.springboot
+      artifactId: '*'
+      newVersion: @camel-spring-boot-version@
+  - org.apache.camel.upgrade.AlignCamelVersions

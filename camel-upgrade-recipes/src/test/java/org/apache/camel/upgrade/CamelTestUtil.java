@@ -163,6 +163,10 @@ public class CamelTestUtil {
         return getString(
                 "camel.latest.version", "Could not determine camel latest version from properties file.");
     }
+    public static String getCamelTargetVersion() {
+        return getString(
+                "camel.target.version", "Could not determine camel target version from properties file.");
+    }
     public static String getCamel410LtsVersion() {
         return getString(
                 "camel4.10.lts.version", "Could not determine 4.10 lts version from properties file.");
