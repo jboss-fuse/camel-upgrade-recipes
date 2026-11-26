@@ -118,12 +118,12 @@ class UndertowMigrationTest implements RewriteTest {
                                 <dependency>
                                     <groupId>io.undertow.ee</groupId>
                                     <artifactId>undertow-servlet</artifactId>
-                                    <version>2.0.2.Final</version>
+                                    <version>2.0.3.Final</version>
                                 </dependency>
                                 <dependency>
                                     <groupId>io.undertow.ee</groupId>
                                     <artifactId>undertow-websockets</artifactId>
-                                    <version>2.0.2.Final</version>
+                                    <version>2.0.3.Final</version>
                                 </dependency>
                             </dependencies>
                         </project>
